@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สื่อวิทย์ Sciencebysine</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  /* โทนสีใหม่ น้ำตาล-เหลือง-ส้ม */
+  --bg: #FFF8E1; 
+  --main: #F57C00;
+  --dark: #4E342E;
+  --white: #FFFFFF;
+  --glow: rgba(245, 124, 0, 0.3);
+  --accent: #FFB300;
+  --status-red: #FF5722;
+  --status-green: #4CAF50;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Mitr',sans-serif;}
+
+body{
+  background:var(--bg);
+  display:flex;
+  justify-content:center;
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* --- พื้นหลังอิโมจิวิทยาศาสตร์ --- */
+.bg-emojis {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  font-size: 24px;
+}
+
+.floating-emoji {
+  position: absolute;
+  animation: floatBG 15s infinite linear;
+  opacity: 0.3;
+}
+
+@keyframes floatBG {
+  0% { transform: translateY(110vh) rotate(0deg); }
+  100% { transform: translateY(-10vh) rotate(360deg); }
+}
+
+.container{
+  max-width:500px;
+  width:100%;
+  padding:20px 15px 40px;
+  z-index: 1;
+}
+
+.section{
+  background:var(--white);
+  border-radius:20px;
+  padding:25px 20px;
+  margin-bottom:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+  border:2px solid var(--main);
+}
+
+h1,h2,h3{color:var(--dark);}
+.center{text-align:center;}
+
+.logo-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo{
+  width:150px;height:150px;
+  border-radius:50%;
+  overflow:hidden;
+  box-shadow:0 6px 20px var(--glow);
+  border: 4px solid var(--white);
+  position: relative;
+  z-index: 2;
+  background-color: var(--white);
+}
+
+.logo img{width:100%;height:100%;object-fit:cover;}
+
+.logo-deco {
+  position: absolute;
+  font-size: 28px;
+  animation: pulse 3s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.badges{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.badge{
+  background:#fff;
+  padding:8px 16px;
+  border-radius:25px;
+  box-shadow:0 4px 10px var(--glow);
+  font-size:13px;
+  color:var(--dark);
+  border: 1px solid var(--main);
+}
+
+.btn{
+  display:block;
+  text-align:center;
+  padding:14px;
+  border-radius:25px;
+  text-decoration:none;
+  margin-top:15px;
+  font-weight:500;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  font-size: 16px;
+}
+
+.btn-outline{
+  background:#fff;
+  border:2px dashed var(--main);
+  color:var(--dark);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--status-green);
+  border-radius: 50%;
+  display: inline-block;
+  animation: dotBlink 1.2s infinite ease-in-out;
+  box-shadow: 0 0 8px var(--status-green);
+}
+.status-dot.closed {
+  background-color: var(--status-red);
+  box-shadow: 0 0 8px var(--status-red);
+}
+
+@keyframes dotBlink {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.btn-main{
+  background:var(--main);
+  color:#fff;
+}
+
+.step{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.step-num{
+  background:var(--main);
+  color:#fff;
+  width:26px;height:26px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  flex-shrink:0;
+  margin-top:2px;
+}
+
+.price-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+  background:#FFFDE7;
+  padding:10px 15px;
+  border-radius:15px;
+  border-left: 4px solid var(--main);
+}
+
+.price-tag{
+  background:var(--main);
+  color:#fff;
+  padding:3px 12px;
+  border-radius:20px;
+  font-size:14px;
+  white-space: nowrap;
+}
+
+.footer{
+  text-align:center;
+  margin-top:30px;
+}
+
+.socials{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-top:15px;
+}
+
+.socials a{
+  flex:1;
+  max-width:100px;
+  text-align:center;
+  padding:8px;
+  border-radius:25px;
+  background:#fff;
+  text-decoration:none;
+  color:var(--dark);
+  font-size:13px;
+  border:1px solid #FFE082;
+}
+
+.small{font-size:12px;opacity:.7;margin-top:10px;}
+
+.rule-box {
+  background: #FFF3E0;
+  padding: 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  margin-top: 15px;
+  border: 1px dashed var(--main);
+}
+
+/* --- Admin Styles --- */
+#admin-panel, #login-panel { display: none; }
+.admin-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
+.admin-list-item { display: flex; justify-content: space-between; align-items: center; background: #FFF3E0; padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; font-size: 14px; border: 1px solid #FFE082; }
+.admin-btn-small { padding: 6px 10px; border:none; background: #e53935; color: white; border-radius: 4px; cursor: pointer; font-size: 12px;}
+.admin-btn-small.edit { background: #1e88e5; margin-right: 5px; }
+.btn-add { background: var(--main); color: white; border: none; border-radius: 5px; padding: 4px 10px; cursor: pointer; float: right; font-size: 14px; }
+
+/* Loader */
+#loader { text-align: center; padding: 50px; color: var(--dark); font-weight: bold; }
+#content-view { display: none; }
+
+/* Custom Modal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none; justify-content: center; align-items: center; z-index: 1000;
+}
+.modal-box {
+  background: white; padding: 25px 20px; border-radius: 15px; width: 90%; max-width: 400px;
+  text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.modal-msg { margin-bottom: 15px; color: var(--dark); font-size: 16px; font-weight: 500;}
+.modal-btns { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+</style>
+</head>
+
+<body>
+  <div class="bg-emojis">
+    <span class="floating-emoji" style="left: 10%; animation-delay: 0s;">🔬</span>
+    <span class="floating-emoji" style="left: 25%; animation-delay: 2s;">🧬</span>
+    <span class="floating-emoji" style="left: 45%; animation-delay: 4s;">🌟</span>
+    <span class="floating-emoji" style="left: 70%; animation-delay: 6s;">🧪</span>
+    <span class="floating-emoji" style="left: 85%; animation-delay: 8s;">🔭</span>
+  </div>
+
+<div class="container">
+
+  <!-- Loader -->
+  <div id="loader">กำลังโหลดข้อมูล... 🔬</div>
+
+  <!-- Content View (Public) -->
+  <div id="content-view">
+    <div class="section center" style="border:none;box-shadow:none;background:transparent;">
+      <div class="logo-wrapper">
+        <span class="logo-deco" style="top: 0; left: 10%;">🔬</span>
+        <span class="logo-deco" style="bottom: 10%; right: 5%;">🌟</span>
+        <span class="logo-deco" style="top: 20%; right: 0%;">🧪</span>
+        <div class="logo">
+          <!-- Fallback image logic added below -->
+          <img id="el-logo" src="" alt="logo" onerror="this.src='https://placehold.co/150x150/F57C00/FFFFFF?text=Logo'">
+        </div>
+      </div>
+
+      <h1 id="el-shop-name">...</h1>
+      <p id="el-desc" style="color:var(--dark);opacity:.8;margin:10px 0 20px;">...</p>
+
+      <div class="badges" id="el-badges"></div>
+
+      <a id="el-status-btn" href="#" class="btn btn-outline" target="_blank">
+        <span class="status-dot" id="el-status-dot"></span> <span id="el-status-text">...</span>
+      </a>
+    </div>
+
+    <div class="section">
+      <h2>📝 ขั้นตอนการสั่งซื้อ</h2>
+      <div id="el-steps" style="margin-top:15px;"></div>
+      <a id="el-portfolio-btn" href="#" class="btn btn-main" target="_blank">ดูตัวอย่างผลงาน ✨</a>
+    </div>
+
+    <div class="section">
+      <h2>💰 เมนูราคางาน</h2>
+      <div id="el-prices" style="margin-top:15px;"></div>
+
+      <div class="rule-box">
+        <strong>📍 กฎของร้าน:</strong><br>
+        <div id="el-rules" style="margin-top:5px;"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <a id="el-line-btn" href="#" class="btn btn-main" target="_blank">สั่งงาน / สอบถามทาง LINE 🎀</a>
+      <div class="socials">
+        <a id="el-fb" href="#" target="_blank">Facebook</a>
+        <a id="el-line" href="#" target="_blank">LINE</a>
+        <a id="el-port" href="#" target="_blank">Portfolio</a>
+      </div>
+      <p class="small">© 2026 <span id="el-footer-name"></span> - ขอบคุณที่ใช้บริการค่ะ <span style="cursor:pointer; padding: 0 5px;" onclick="showLogin()">🔒</span></p>
+    </div>
+  </div>
+
+  <!-- Login Panel -->
+  <div id="login-panel" class="section">
+    <h2>🔒 เข้าสู่ระบบ Admin</h2>
+    <div style="margin-top:15px;">
+      <input type="email" id="login-email" class="admin-input" placeholder="Email แอดมิน">
+      <input type="password" id="login-password" class="admin-input" placeholder="Password">
+      <button onclick="handleLogin()" class="btn btn-main">เข้าสู่ระบบ</button>
+      <button onclick="cancelAdmin()" class="btn btn-outline">ยกเลิก</button>
+      <p id="login-err" style="color:red;font-size:13px;margin-top:10px; text-align: center;"></p>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="admin-panel">
+    <div class="section">
+      <h2>🛠 ตั้งค่าข้อมูลร้าน</h2>
+      <div style="margin-top:15px;">
+        <label>ชื่อร้าน:</label>
+        <input type="text" id="cfg-name" class="admin-input">
+        
+        <label>คำอธิบาย:</label>
+        <input type="text" id="cfg-desc" class="admin-input">
+        
+        <label>โลโก้ URL (Link รูปภาพ):</label>
+        <input type="text" id="cfg-logo" class="admin-input">
+        
+        <label>สถานะ (เช่น เปิดรับคิว):</label>
+        <input type="text" id="cfg-status" class="admin-input">
+        
+        <label style="display:block; margin-bottom:15px;">
+          <input type="checkbox" id="cfg-isopen" style="width:16px; height:16px;"> เปิดร้านอยู่ (แสดงจุดสีเขียว)
+        </label>
+        
+        <label>LINE URL (ลิงก์ติดต่อหลัก):</label>
+        <input type="text" id="cfg-line" class="admin-input">
+
+        <label>Facebook URL:</label>
+        <input type="text" id="cfg-fb" class="admin-input">
+
+        <label>Portfolio URL:</label>
+        <input type="text" id="cfg-port" class="admin-input">
+        
+        <button onclick="saveSiteInfo()" class="btn btn-main" style="padding:10px;">บันทึกข้อมูลร้าน</button>
+      </div>
+    </div>
+
+    <!-- Lists Editors -->
+    <div class="section"><h3>ป้ายกำกับ <button class="btn-add" onclick="addBadge()">+ เพิ่ม</button></h3><div id="admin-badges" style="margin-top:15px;"></div></div>
+    <div class="section"><h3>ขั้นตอน <button class="btn-add" onclick="addStep()">+ เพิ่ม</button></h3><div id="admin-steps" style="margin-top:15px;"></div></div>
+    <div class="section"><h3>ราคา <button class="btn-add" onclick="addPrice()">+ เพิ่ม</button></h3><div id="admin-prices" style="margin-top:15px;"></div></div>
+    <div class="section"><h3>กฎระเบียบ <button class="btn-add" onclick="addRule()">+ เพิ่ม</button></h3><div id="admin-rules" style="margin-top:15px;"></div></div>
+
+    <button onclick="handleLogout()" class="btn btn-outline" style="border-color:red; color:red; margin-bottom: 20px;">ออกจากระบบ</button>
+    <button onclick="cancelAdmin()" class="btn btn-outline" style="background:#f5f5f5;">กลับไปหน้าเว็บ (โหมดผู้ชม)</button>
+  </div>
+</div>
+
+<!-- Custom Modal Overlay (Replaces alerts & confirms) -->
+<div id="custom-modal" class="modal-overlay">
+  <div class="modal-box">
+    <p id="modal-msg" class="modal-msg"></p>
+    <input type="text" id="modal-input" class="admin-input" style="display:none; text-align:center;">
+    <div class="modal-btns">
+      <button id="modal-btn-ok" class="btn btn-main" style="width:auto; padding:8px 20px;">ตกลง</button>
+      <button id="modal-btn-cancel" class="btn btn-outline" style="width:auto; padding:8px 20px; display:none;">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ----------------------------------------------------
+  // Custom Modal Functions (No alert/confirm used)
+  // ----------------------------------------------------
+  function showModal(msg, type = 'alert', callback = null, defaultInput = "") {
+    const overlay = document.getElementById('custom-modal');
+    const msgEl = document.getElementById('modal-msg');
+    const inputEl = document.getElementById('modal-input');
+    const btnOk = document.getElementById('modal-btn-ok');
+    const btnCancel = document.getElementById('modal-btn-cancel');
+
+    msgEl.innerHTML = msg; // Allows basic HTML in messages
+    overlay.style.display = 'flex';
+    
+    inputEl.style.display = type === 'prompt' ? 'block' : 'none';
+    inputEl.value = defaultInput;
+    if(type === 'prompt') inputEl.focus();
+
+    btnCancel.style.display = (type === 'confirm' || type === 'prompt') ? 'block' : 'none';
+
+    btnOk.onclick = () => {
+      overlay.style.display = 'none';
+      if(type === 'prompt' && callback) callback(inputEl.value);
+      else if(callback) callback(true);
+    };
+
+    btnCancel.onclick = () => {
+      overlay.style.display = 'none';
+      if(type === 'prompt' && callback) callback(null);
+      else if(callback) callback(false);
+    };
+  }
+
+  function customAlert(msg) { showModal(msg, 'alert'); }
+  function customConfirm(msg, cb) { showModal(msg, 'confirm', cb); }
+  function customPrompt(msg, defaultInput, cb) { showModal(msg, 'prompt', cb, defaultInput); }
+
+
+  // ----------------------------------------------------
+  // ตั้งค่า Supabase
+  // ----------------------------------------------------
+  const supabaseUrl = 'https://xvanwhsabiabsxktrcup.supabase.co';
+  const supabaseKey = 'sb_publishable_BGKiYAE7u1B2iWPlrErJcw_ngL6XuF2';
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  let siteData = {};
+
+  async function initApp() {
+    await fetchPublicData();
+    checkAuthSession();
+  }
+
+  // ----------------------------------------------------
+  // ฝั่ง Public (ดึงและแสดงผล)
+  // ----------------------------------------------------
+  async function fetchPublicData() {
+    try {
+      const [infoRes, badgesRes, stepsRes, pricesRes, rulesRes] = await Promise.all([
+        supabase.from('site_info').select('*').eq('id', 1).single(),
+        supabase.from('badges').select('*').order('order_idx'),
+        supabase.from('steps').select('*').order('order_idx'),
+        supabase.from('prices').select('*').order('order_idx'),
+        supabase.from('rules').select('*').order('order_idx')
+      ]);
+
+      if (infoRes.error) throw infoRes.error;
+      
+      siteData.info = infoRes.data;
+      siteData.badges = badgesRes.data || [];
+      siteData.steps = stepsRes.data || [];
+      siteData.prices = pricesRes.data || [];
+      siteData.rules = rulesRes.data || [];
+
+      renderPublicUI();
+    } catch (err) {
+      console.warn("Supabase fetch error. Loading Fallback Data for Preview.", err);
+      // Fallback Data สำหรับ Preview หากยังไม่ได้สร้าง Table หรือตั้งค่า Database
+      siteData = {
+        info: { 
+          shop_name: "สื่อวิทย์ Sciencebysine", 
+          description: "(โหมดพรีวิว - กรุณารัน SQL เพื่อเชื่อมข้อมูลจริง) 🔬✨", 
+          is_open: true, 
+          status_text: "เปิดรับออเดอร์นะคะ 🧪", 
+          logo_url: "https://i.postimg.cc/W4h0qsMn/att-Jq-B1K5lr6Lv-Kw-DOKxwoty5KVHG6lz-Hn-Gx2Kq-Nsq-WJ8M.jpg",
+          line_url: "https://lin.ee/V1bfWni",
+          facebook_url: "https://www.facebook.com",
+          portfolio_url: "https://drive.google.com"
+        },
+        badges: [{label: "🔬 สื่อวิทยาศาสตร์"}, {label: "📚 ใบงานสีสันสดใส"}, {label: "🧬 เข้าใจง่าย"}],
+        steps: [{step_num:1, description:"เลือกแบบสื่อการสอนที่สนใจ"}, {step_num:2, description:"แจ้งรายละเอียด และระดับชั้น"}],
+        prices: [{item_name:"สื่อทำมือ (Pop-up)", price_text:"เริ่ม 89฿"}, {item_name:"ใบงาน (ไฟล์ PDF)", price_text:"เริ่ม 39฿"}],
+        rules: [{content:"ไฟล์ดิจิทัลห้ามนำไปใช้เชิงพาณิชย์ทุกกรณี"}]
+      };
+      renderPublicUI();
+    }
+  }
+
+  function renderPublicUI() {
+    const info = siteData.info;
+    document.title = info.shop_name;
+    document.getElementById('el-logo').src = info.logo_url;
+    document.getElementById('el-shop-name').innerText = info.shop_name;
+    document.getElementById('el-desc').innerText = info.description;
+    
+    document.getElementById('el-status-text').innerText = info.status_text;
+    document.getElementById('el-status-dot').className = info.is_open ? 'status-dot' : 'status-dot closed';
+    document.getElementById('el-status-btn').href = info.line_url;
+
+    document.getElementById('el-portfolio-btn').href = info.portfolio_url;
+    document.getElementById('el-line-btn').href = info.line_url;
+    document.getElementById('el-fb').href = info.facebook_url;
+    document.getElementById('el-line').href = info.line_url;
+    document.getElementById('el-port').href = info.portfolio_url;
+    document.getElementById('el-footer-name').innerText = info.shop_name;
+
+    document.getElementById('el-badges').innerHTML = siteData.badges.map(b => `<div class="badge">${b.label}</div>`).join('');
+    document.getElementById('el-steps').innerHTML = siteData.steps.map(s => `<div class="step"><div class="step-num">${s.step_num}</div><div>${s.description}</div></div>`).join('');
+    document.getElementById('el-prices').innerHTML = siteData.prices.map(p => `<div class="price-row"><span>${p.item_name}</span><span class="price-tag">${p.price_text}</span></div>`).join('');
+    document.getElementById('el-rules').innerHTML = siteData.rules.map(r => `• ${r.content}<br>`).join('');
+
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('content-view').style.display = 'block';
+  }
+
+  // ----------------------------------------------------
+  // ระบบ Auth & Admin
+  // ----------------------------------------------------
+  async function checkAuthSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      // หากพบว่า Login ค้างไว้ ให้ดึงข้อมูลมาแสดงแผงควบคุมเลย
+      renderAdminUI();
+    }
+  }
+
+  function showLogin() {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        document.getElementById('content-view').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        renderAdminUI();
+      } else {
+        document.getElementById('content-view').style.display = 'none';
+        document.getElementById('login-panel').style.display = 'block';
+      }
+    });
+  }
+
+  function cancelAdmin() {
+    document.getElementById('login-panel').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('content-view').style.display = 'block';
+    fetchPublicData();
+  }
+
+  async function handleLogin() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-err');
+    errEl.innerText = "กำลังตรวจสอบข้อมูล...";
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      errEl.innerText = "เข้าสู่ระบบล้มเหลว: " + error.message;
+    } else {
+      errEl.innerText = "";
+      document.getElementById('login-panel').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      renderAdminUI();
+    }
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    cancelAdmin();
+    customAlert("ออกจากระบบเรียบร้อยแล้ว");
+  }
+
+  // ----------------------------------------------------
+  // ฝั่ง Admin CRUD
+  // ----------------------------------------------------
+  function renderAdminUI() {
+    const info = siteData.info;
+    document.getElementById('cfg-name').value = info.shop_name || '';
+    document.getElementById('cfg-desc').value = info.description || '';
+    document.getElementById('cfg-logo').value = info.logo_url || '';
+    document.getElementById('cfg-status').value = info.status_text || '';
+    document.getElementById('cfg-isopen').checked = info.is_open;
+    document.getElementById('cfg-line').value = info.line_url || '';
+    document.getElementById('cfg-fb').value = info.facebook_url || '';
+    document.getElementById('cfg-port').value = info.portfolio_url || '';
+
+    renderAdminList('badges', siteData.badges, 'label', 'admin-badges');
+    renderAdminList('steps', siteData.steps, 'description', 'admin-steps');
+    renderAdminList('prices', siteData.prices, 'item_name', 'admin-prices', 'price_text');
+    renderAdminList('rules', siteData.rules, 'content', 'admin-rules');
+  }
+
+  async function saveSiteInfo() {
+    const updates = {
+      shop_name: document.getElementById('cfg-name').value,
+      description: document.getElementById('cfg-desc').value,
+      logo_url: document.getElementById('cfg-logo').value,
+      status_text: document.getElementById('cfg-status').value,
+      is_open: document.getElementById('cfg-isopen').checked,
+      line_url: document.getElementById('cfg-line').value,
+      facebook_url: document.getElementById('cfg-fb').value,
+      portfolio_url: document.getElementById('cfg-port').value
+    };
+    
+    const { error } = await supabase.from('site_info').update(updates).eq('id', 1);
+    
+    if(error) {
+      customAlert("เกิดข้อผิดพลาด: <br>" + error.message);
+    } else { 
+      customAlert("บันทึกข้อมูลร้านสำเร็จ!"); 
+      fetchPublicData(); 
+    }
+  }
+
+  function renderAdminList(table, dataList, primaryField, elId, secondaryField = null) {
+    if(!dataList || dataList.length === 0) {
+      document.getElementById(elId).innerHTML = '<div style="color:#777; font-size:14px;">ไม่มีข้อมูล</div>';
+      return;
+    }
+    
+    const html = dataList.map(item => `
+      <div class="admin-list-item">
+        <span style="flex:1;">${item[primaryField]} ${secondaryField && item[secondaryField] ? `<br><small style="color:var(--main)">(${item[secondaryField]})</small>` : ''}</span>
+        <div style="flex-shrink:0;">
+          <button class="admin-btn-small edit" onclick="editItem('${table}', '${item.id}', '${primaryField}', '${secondaryField}')">แก้</button>
+          <button class="admin-btn-small" onclick="deleteItem('${table}', '${item.id}')">ลบ</button>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById(elId).innerHTML = html;
+  }
+
+  // Generic Add
+  async function addItem(table, insertData) {
+    const { error } = await supabase.from(table).insert([insertData]);
+    if(error) customAlert(error.message); 
+    else { await fetchPublicData(); renderAdminUI(); }
+  }
+  
+  // Generic Delete
+  async function deleteItem(table, id) {
+    customConfirm("ยืนยันการลบรายการนี้?", async (yes) => {
+      if(!yes) return;
+      const { error } = await supabase.from(table).delete().eq('id', id);
+      if(error) customAlert(error.message); 
+      else { await fetchPublicData(); renderAdminUI(); }
+    });
+  }
+  
+  // Generic Edit using Custom Prompt
+  function editItem(table, id, primaryField, secondaryField) {
+    customPrompt(`แก้ไขข้อมูล:`, "", (newVal) => {
+      if(!newVal) return;
+      let updateData = { [primaryField]: newVal };
+      
+      if(secondaryField && secondaryField !== 'null') {
+        setTimeout(() => { // slight delay to allow first modal to close smoothly
+           customPrompt("แก้ไขส่วนที่ 2 (เช่น ราคา):", "", async (secVal) => {
+             if(secVal) updateData[secondaryField] = secVal;
+             runUpdate(table, id, updateData);
+           });
+        }, 300);
+      } else {
+        runUpdate(table, id, updateData);
+      }
+    });
+  }
+
+  async function runUpdate(table, id, updateData) {
+    const { error } = await supabase.from(table).update(updateData).eq('id', id);
+    if(error) customAlert(error.message); 
+    else { await fetchPublicData(); renderAdminUI(); }
+  }
+
+  // Specific Add Handlers
+  function addBadge() {
+    customPrompt("ชื่อป้ายกำกับใหม่:", "", (v) => {
+      if(v) addItem('badges', {label: v, order_idx: siteData.badges.length+1});
+    });
+  }
+  function addStep() {
+    customPrompt("รายละเอียดขั้นตอนใหม่:", "", (v) => {
+      if(v) addItem('steps', {step_num: siteData.steps.length+1, description: v, order_idx: siteData.steps.length+1});
+    });
+  }
+  function addPrice() {
+    customPrompt("ชื่อสินค้า:", "", (name) => {
+      if(!name) return;
+      setTimeout(() => {
+        customPrompt("ราคา (เช่น เริ่ม 99฿):", "", (price) => {
+          if(price) addItem('prices', {item_name: name, price_text: price, order_idx: siteData.prices.length+1});
+        });
+      }, 300);
+    });
+  }
+  function addRule() {
+    customPrompt("กฎข้อใหม่:", "", (v) => {
+      if(v) addItem('rules', {content: v, order_idx: siteData.rules.length+1});
+    });
+  }
+
+  // Start App
+  initApp();
+</script>
+</body>
+</html>
